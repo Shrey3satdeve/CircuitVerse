@@ -151,12 +151,10 @@ class Project < ApplicationRecord
 
     def clean_description
       profanity_filter = LanguageFilter::Filter.new matchlist: :profanity
-      return nil unless profanity_filter.match? description
-
-      errors.add(
-        :description,
-        "contains inappropriate language: #{profanity_filter.matched(description).join(', ')}"
-      )
+      if profanity_filter.match?(description)
+        matched_words = profanity_filter.matched(description).join(', ')
+        errors.add(:description, "contains inappropriate language: #{matched_words}")
+      end
     end
 
     def check_and_remove_featured
